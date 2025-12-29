@@ -1,0 +1,86 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+
+    <header class="header">
+      <h1>
+        {{ isEditMode ? 'Editar Sala' : 'Criar Sala' }}
+        <span class="cinema-name" *ngIf="cinemaName"> — {{ cinemaName }}</span>
+      </h1>
+    </header>
+
+    <div class="form-wrapper">
+
+      <div class="hall-editor-layout">
+
+        <form (ngSubmit)="submit()" class="card inputs-card">
+
+          <div class="form-control">
+            <label for="hall-name">Nome da Sala</label>
+            <input id="hall-name" type="text" [(ngModel)]="form.name" name="name" placeholder="Ex: Sala 1" required>
+          </div>
+
+          <div class="row-inputs">
+            <div class="form-control">
+              <label for="hall-rows">Filas</label>
+              <input id="hall-rows" type="number" [(ngModel)]="form.rows" name="rows" (ngModelChange)="generateMap()"
+                min="1" required>
+            </div>
+
+            <div class="form-control">
+              <label for="hall-seats">Lugares/Fila</label>
+              <input id="hall-seats" type="number" [(ngModel)]="form.seatsPerRow" name="seatsPerRow"
+                (ngModelChange)="generateMap()" min="1" required>
+            </div>
+          </div>
+
+          <div class="stats-legend">
+            <div class="stat-item"><span class="dot normal"></span> Normal: <strong>{{ stats.normal }}</strong></div>
+            <div class="stat-item"><span class="dot vip"></span> VIP: <strong>{{ stats.vip }}</strong></div>
+            <div class="stat-item"><span class="dot reduced"></span> Reduzida: <strong>{{ stats.reduced }}</strong>
+            </div>
+          </div>
+
+          <div class="helper-text">
+            * Fila A: Mobilidade Reduzida.<br>
+            * Clica nos lugares à direita para mudar o tipo.
+          </div>
+
+          <div class="buttons">
+            <button class="btn-create" [disabled]="loading">
+              {{ loading ? 'A guardar...' : (isEditMode ? 'Guardar Alterações' : 'Criar Sala') }}
+            </button>
+
+            <button type="button" class="btn-cancel" (click)="onCancel()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+
+        <div class="preview-card" *ngIf="seatMap.length > 0">
+          <div class="screen">Ecrã</div>
+
+          <div class="seat-map-container">
+            <div class="seat-row" *ngFor="let row of seatMap; let i = index">
+              <div class="row-label">{{ row[0].row }}</div>
+
+              <div class="seats-row-inner">
+                <div *ngFor="let seat of row" class="seat" [ngClass]="{
+               'is-vip': seat.type === 'VIP',
+               'is-reduced': seat.type === 'Reduced',
+               'is-normal': seat.type === 'Normal'
+             }" (click)="toggleSeatType(seat)" (keyup.enter)="toggleSeatType(seat)"
+                  (keyup.space)="toggleSeatType(seat)" tabindex="0" role="button" [title]="seat.seatNumber">
+                  {{ seat.number }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>

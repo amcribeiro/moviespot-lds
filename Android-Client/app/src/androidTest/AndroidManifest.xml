@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.moviespot.test">
+
+    <application
+        android:name="com.example.moviespot.TestApp"
+        android:allowBackup="false"/>
+
+</manifest>

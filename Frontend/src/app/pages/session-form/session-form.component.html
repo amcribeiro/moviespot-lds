@@ -1,0 +1,116 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+
+    <header class="header">
+      <h1>
+        {{ isEditMode ? 'Editar Sessão' : 'Criar Sessão' }}
+      </h1>
+    </header>
+
+    <div class="form-wrapper">
+
+      <form (ngSubmit)="submit()" class="card">
+
+        <div class="form-control">
+          <label for="session-movie">Filme</label>
+          <select id="session-movie"
+                  [(ngModel)]="form.movieId"
+                  name="movieId"
+                  (change)="onMovieSelected()"
+                  required>
+            <option [ngValue]="0">-- seleciona --</option>
+            <option *ngFor="let m of movies" [ngValue]="m.id">
+              {{ m.title }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label for="session-cinema">Cinema</label>
+          <select id="session-cinema"
+                  [(ngModel)]="form.cinemaId"
+                  name="cinemaId"
+                  (change)="onCinemaSelected()"
+                  required>
+            <option [ngValue]="0">-- seleciona --</option>
+            <option *ngFor="let c of cinemas" [ngValue]="c.id">
+              {{ c.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label for="session-hall">Sala</label>
+          <select id="session-hall"
+                  [(ngModel)]="form.cinemaHallId"
+                  name="cinemaHallId"
+                  (change)="loadAvailableTimes()"
+                  [disabled]="halls.length === 0"
+                  required>
+            <option [ngValue]="0">-- seleciona --</option>
+            <option *ngFor="let h of halls" [ngValue]="h.id">
+              {{ h.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label for="session-start-date">Data</label>
+          <input id="session-start-date"
+                 type="date"
+                 [(ngModel)]="form.startDate"
+                 name="startDate"
+                 (change)="loadAvailableTimes()"
+                 required />
+        </div>
+
+        <div class="time-slot-container" *ngIf="form.cinemaHallId && form.startDate">
+          <div class="form-control-label">Horários Disponíveis</div>
+
+          <div *ngIf="loadingTimes">A carregar horários...</div>
+
+          <div *ngIf="!loadingTimes && errorMessage" class="error">
+            {{ errorMessage }}
+          </div>
+
+          <div class="slots" role="list"
+               *ngIf="!loadingTimes && (!errorMessage || availableTimes.length > 0)">
+            <button type="button"
+                    class="slot"
+                    *ngFor="let t of availableTimes"
+                    [class.active]="t === selectedTime"
+                    (click)="selectedTime = t">
+              {{ t }}
+            </button>
+          </div>
+
+          <div *ngIf="!loadingTimes && !errorMessage && availableTimes.length === 0">
+            Nenhum horário disponível.
+          </div>
+        </div>
+
+        <div class="form-control">
+          <label for="session-price">Preço (€)</label>
+          <input id="session-price"
+                 type="number"
+                 [(ngModel)]="form.price"
+                 name="price"
+                 min="0"
+                 required />
+        </div>
+
+        <button class="btn-create" [disabled]="!selectedTime">
+          {{ isEditMode ? 'Guardar Alterações' : 'Criar Sessão' }}
+        </button>
+        <button class="btn-cancel" (click)="cancel()">
+          Cancelar
+        </button>
+
+      </form>
+
+    </div>
+
+  </main>
+</div>

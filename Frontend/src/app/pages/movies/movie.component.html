@@ -1,0 +1,47 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+
+    <header class="header">
+      <h1>Filmes</h1>
+      </header>
+
+    <div *ngIf="loading">A carregar filmes...</div>
+    
+    <div *ngIf="!loading && errorMessage" class="error">
+        {{ errorMessage }}
+    </div>
+
+    <div class="list-wrapper" *ngIf="!loading && movies.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 60px;">Poster</th> <th>Título</th>
+            <th>Géneros</th>
+            <th>Duração</th>
+            <th>Data Lançamento</th>
+            <th>País</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of movies">
+            <td>
+              <img *ngIf="m.posterPath" [src]="m.posterPath" alt="Poster" 
+                   style="width: 40px; border-radius: 4px;">
+              <span *ngIf="!m.posterPath">🎬</span>
+            </td>
+            <td><strong>{{ m.title }}</strong></td>
+            <td>
+               {{ m.genres.join(', ') }}
+            </td>
+            <td>{{ m.duration }} min</td>
+            <td>{{ m.releaseDate | date:'shortDate' }}</td>
+            <td>{{ m.country }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>

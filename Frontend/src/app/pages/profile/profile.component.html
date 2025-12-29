@@ -1,0 +1,75 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <header class="header">
+      <h1>O Meu Perfil</h1>
+    </header>
+
+    <div class="form-wrapper" *ngIf="user">
+      <div class="card">
+
+        <div class="profile-row">
+          <label for="profile-name">Nome</label>
+          <ng-container *ngIf="!isEditing; else editName">
+            <span>{{ user.name }}</span>
+          </ng-container>
+          <ng-template #editName>
+            <input id="profile-name" name="profileName" [(ngModel)]="user.name" />
+          </ng-template>
+        </div>
+
+        <div class="profile-row">
+          <label for="profile-email">Email</label>
+          <ng-container *ngIf="!isEditing; else editEmail">
+            <span>{{ user.email }}</span>
+          </ng-container>
+          <ng-template #editEmail>
+            <input id="profile-email" name="profileEmail" [(ngModel)]="user.email" />
+          </ng-template>
+        </div>
+
+        <div class="profile-row">
+          <label for="profile-phone">Telefone</label>
+          <ng-container *ngIf="!isEditing; else editPhone">
+            <span>{{ user.phone || '-' }}</span>
+          </ng-container>
+          <ng-template #editPhone>
+            <input id="profile-phone" name="profilePhone" [(ngModel)]="user.phone" />
+          </ng-template>
+        </div>
+
+        <div class="profile-row">
+          <div class="profile-label">Papel</div>
+          <span>{{ user.role }}</span>
+        </div>
+
+        <div class="profile-row">
+          <div class="profile-label">Status</div>
+          <span>{{ user.accountStatus }}</span>
+        </div>
+
+        <div class="profile-row">
+          <div class="profile-label">Conta Criada</div>
+          <span>{{ user.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+
+        <div class="actions">
+          <button *ngIf="!isEditing" class="btn-create" (click)="enableEdit()">Editar Perfil</button>
+          <ng-container *ngIf="isEditing">
+            <button class="btn-create" (click)="save()">
+              Guardar Alterações
+            </button>
+            
+            <button class="btn-cancel" (click)="cancel()">
+              Cancelar
+            </button>
+          </ng-container>
+        </div>
+        
+
+      </div>
+    </div>
+
+  </main>
+</div>

@@ -1,0 +1,97 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <header class="header">
+      <h1>Cinemas</h1>
+      <button class="btn-create" (click)="goCreate()">+ Novo Cinema</button>
+    </header>
+
+    <div class="list-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Rua</th>
+            <th>Cidade</th>
+            <th>País</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <ng-container *ngFor="let c of cinemas">
+            <tr class="row-clickable" (click)="toggle(c.id)">
+              <td>{{ c.id }}</td>
+              <td>{{ c.name }}</td>
+              <td>{{ c.street }}</td>
+              <td>{{ c.city }}</td>
+              <td>{{ c.country }}</td>
+
+              <td class="actions" (click)="$event.stopPropagation()">
+                <button class="btn-small green" (click)="addHall(c.id)">+ Sala</button>
+                <button class="btn-small blue" (click)="editCinema(c.id)">Editar</button>
+                <button class="btn-small red" (click)="deleteCinema(c.id)">Del</button>
+              </td>
+            </tr>
+
+            <tr *ngIf="expanded[c.id]">
+              <td colspan="7">
+                <div class="accordion">
+                  <h3>Salas de {{ c.name }}</h3>
+
+                  <div
+                    *ngIf="cinemaHalls[c.id] && cinemaHalls[c.id].length === 0"
+                    class="empty">
+                    Nenhuma sala encontrada.
+                  </div>
+
+                  <table
+                    *ngIf="cinemaHalls[c.id] && cinemaHalls[c.id].length > 0"
+                    class="inner-table">
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Total</th>
+                        <th>VIP</th>
+                        <th>Reduzidos</th>
+                        <th>Normais</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr *ngFor="let item of cinemaHalls[c.id]">
+                        <td>{{ item.hall.name }}</td>
+                        <td>{{ item.total }}</td>
+                        <td>{{ item.vip }}</td>
+                        <td>{{ item.reduced }}</td>
+                        <td>{{ item.normal }}</td>
+
+                        <td class="actions">
+                          <button
+                            class="btn-small blue"
+                            (click)="editHall(item.hall.id, c.id)">
+                            Editar
+                          </button>
+
+                          <button
+                            class="btn-small red"
+                            (click)="deleteHall(item.hall.id, c.id)">
+                            Del
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>

@@ -1,0 +1,56 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+
+    <header class="header">
+      <h1>Sessões</h1>
+      <button (click)="goToCreate()" routerLinkActive="active" class="btn-create">
+        +
+        <span>Nova sessão</span>
+      </button>
+    </header>
+
+    <div *ngIf="loading">A carregar sessões...</div>
+    <div *ngIf="sessions.length === 0" style="opacity: 0.6; margin-top: 10px;">
+      Ainda não existem sessões criadas. Clica em <b>+ Nova Sessão</b>.
+    </div>
+
+    <div class="list-wrapper" *ngIf="!loading && sessions.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Filme</th>
+            <th>Cinema / Sala</th>
+            <th>Início</th>
+            <th>Fim</th>
+            <th>Preço</th>
+            <th>Criado por</th>
+            <th style="width: 150px;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of sessions">
+            <td>{{ s.id }}</td>
+            <td>{{ s.movieTitle }}</td>
+            <td>{{ s.cinemaHallName }}</td>
+            <td>{{ s.startDate | date:'short' }}</td>
+            <td>{{ s.endDate   | date:'short' }}</td>
+            <td>{{ s.price | number:'1.2-2' }} €</td>
+            <td>{{ s.createdByName }}</td>
+            <td class="actions">
+              <button class="btn-small blue" (click)="goToEdit(s.id)">Editar</button>
+              <button class="btn-small red"  (click)="deleteSession(s.id)">Del</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="!loading && !errorMessage && sessions.length === 0">
+      Ainda não existem sessões.
+    </div>
+
+  </main>
+</div>

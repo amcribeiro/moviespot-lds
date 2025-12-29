@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- Ignora avisos comuns no Compose -->
+    <issue id="ComposableNaming" severity="ignore" />
+    <issue id="ComposableFunctionName" severity="ignore" />
+
+    <!-- Ignora avisos de Firebase que o Lint não entende -->
+    <issue id="UnusedResources" severity="ignore" />
+
+    <!-- Ignora avisos de traduções (não relevante em dev inicial) -->
+    <issue id="MissingTranslation" severity="ignore" />
+</lint>

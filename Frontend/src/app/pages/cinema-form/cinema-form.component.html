@@ -1,0 +1,133 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <header class="header">
+      <h1>{{ isEditMode ? "Editar Cinema" : "Criar Cinema" }}</h1>
+    </header>
+
+    <div class="form-wrapper">
+      <form (ngSubmit)="submit()" class="card">
+        <div class="map-info-row">
+          <div class="info-column">
+            <div class="form-control">
+              <label for="cinema-name">Nome</label>
+              <input
+                id="cinema-name"
+                type="text"
+                [(ngModel)]="form.name"
+                name="name"
+                required
+              />
+            </div>
+
+            <ng-container *ngIf="form.latitude !== 0 && form.longitude !== 0">
+              <div class="form-control">
+                <label for="cinema-street">Rua</label>
+                <input
+                  id="cinema-street"
+                  type="text"
+                  [(ngModel)]="form.street"
+                  name="street"
+                  readonly
+                />
+              </div>
+
+              <div class="form-control">
+                <label for="cinema-city">Cidade</label>
+                <input
+                  id="cinema-city"
+                  type="text"
+                  [(ngModel)]="form.city"
+                  name="city"
+                  readonly
+                />
+              </div>
+
+              <div class="form-control">
+                <label for="cinema-state">Estado / Distrito</label>
+                <input
+                  id="cinema-state"
+                  type="text"
+                  [(ngModel)]="form.state"
+                  name="state"
+                  readonly
+                />
+              </div>
+
+              <div class="form-control">
+                <label for="cinema-zip">Código Postal</label>
+                <input
+                  id="cinema-zip"
+                  type="text"
+                  [(ngModel)]="form.zipCode"
+                  name="zipCode"
+                  readonly
+                />
+              </div>
+
+              <div class="form-control">
+                <label for="cinema-country">País</label>
+                <input
+                  id="cinema-country"
+                  type="text"
+                  [(ngModel)]="form.country"
+                  name="country"
+                  readonly
+                />
+              </div>
+
+              <div class="form-control">
+                <label for="cinema-latitude">Latitude</label>
+                <input
+                  id="cinema-latitude"
+                  type="text"
+                  [(ngModel)]="form.latitude"
+                  name="latitude"
+                  readonly
+                />
+              </div>
+
+              <div class="form-control">
+                <label for="cinema-longitude">Longitude</label>
+                <input
+                  id="cinema-longitude"
+                  type="text"
+                  [(ngModel)]="form.longitude"
+                  name="longitude"
+                  readonly
+                />
+              </div>
+            </ng-container>
+          </div>
+
+          <div class="form-control map-column">
+            <div class="form-control-label">Localização</div>
+            <app-map-picker
+              (locationSelected)="updateLocation($event)"
+            ></app-map-picker>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="btn-create" [disabled]="loading">
+            <ng-container *ngIf="isEditMode; else createLabel">
+              {{ loading ? "A guardar..." : "Guardar Alterações" }}
+            </ng-container>
+            <ng-template #createLabel>
+              {{ loading ? "A criar..." : "Criar Cinema" }}
+            </ng-template>
+          </button>
+
+          <button type="button" class="btn-cancel" (click)="onCancel()">
+            Cancelar
+          </button>
+        </div>
+
+        <p *ngIf="errorMessage" class="error">
+          {{ errorMessage }}
+        </p>
+      </form>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,74 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="logo">
+      <img src="assets/MovieSpot_log.png" alt="MovieSpot" />
+      <h1>MovieSpot</h1>
+    </div>
+
+    <h2>Criar Conta Staff</h2>
+    <p class="subtitle">Preenche os campos para criar uma conta de Staff</p>
+
+    <form (ngSubmit)="handleSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="name">Nome</label>
+        <input
+          type="text"
+          id="name"
+          [(ngModel)]="name"
+          name="name"
+          placeholder="Nome completo"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="Insere o teu email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Cria uma password"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Telemóvel (opcional)</label>
+        <input
+          type="text"
+          id="phone"
+          [(ngModel)]="phone"
+          name="phone"
+          placeholder="Número de telemóvel"
+        />
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="loading">
+        {{ loading ? 'A criar conta...' : 'Criar Conta Staff' }}
+      </button>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+       <p class="subtitle" style="text-align: center; margin-top: 16px;">
+        <a href="#" (click)="goToLogin(); $event.preventDefault()" class="link" aria-label="Go to login">
+          Já tens conta? Inicia sessão
+        </a>
+      </p>
+    </form>
+  </div>
+</div>

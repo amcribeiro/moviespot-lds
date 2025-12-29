@@ -1,0 +1,88 @@
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-content">
+    <header class="header">
+      <h1>Bem-vindo, {{ userName }}</h1>
+
+      <div class="header-actions">
+        <button class="user-avatar" type="button" (click)="goToProfile()">
+          <img
+            src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg"
+            alt="User"
+          />
+        </button>
+      </div>
+    </header>
+
+    <div class="dashboard-content">
+      <div class="welcome-section">
+        <h2>Bem vindo ao MovieSpot</h2>
+        <p>Gere as tuas sessões de cinema, salas e filmes tudo num só lugar.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div
+            class="stat-icon"
+            style="background: rgba(95, 95, 245, 0.1);"
+          ></div>
+          <div class="stat-info">
+            <span class="stat-label">Total sessões</span>
+            <span class="stat-value">{{ stats.totalSessions }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div
+            class="stat-icon"
+            style="background: rgba(214, 69, 69, 0.1);"
+          ></div>
+          <div class="stat-info">
+            <span class="stat-label">Salas de Cinema ativas</span>
+            <span class="stat-value">{{ stats.activeRooms }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div
+            class="stat-icon"
+            style="background: rgba(46, 213, 115, 0.1);"
+          ></div>
+          <div class="stat-info">
+            <span class="stat-label">Sessões de hoje</span>
+            <span class="stat-value">{{ stats.todaysSessions }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div
+            class="stat-icon"
+            style="background: rgba(255, 159, 67, 0.1);"
+          ></div>
+          <div class="stat-info">
+            <span class="stat-label">Filmes</span>
+            <span class="stat-value">{{ stats.movies }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-section">
+      <div class="chart-card">
+        <h3>Visão Geral das Sessões</h3>
+        <canvas id="sessionsChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>Sessões por Dia</h3>
+        <canvas id="dailyChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>Distribuição de Filmes</h3>
+        <canvas id="moviesChart"></canvas>
+      </div>
+    </div>
+  </main>
+</div>

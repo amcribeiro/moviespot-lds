@@ -1,0 +1,51 @@
+<div class="dashboard-layout">
+
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+
+    <div class="header">
+      <h1>Vouchers</h1>
+
+      <button class="create-btn" (click)="createVoucher()" [disabled]="loading">
+        + Criar Voucher
+      </button>
+    </div>
+
+    <div *ngIf="vouchers.length === 0" style="opacity: 0.6; margin-top: 10px;">
+      Ainda não existem vouchers criados. Clica em <b>+ Criar Voucher</b>.
+    </div>
+
+    <div class="table-wrapper" *ngIf="vouchers.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Valor</th>
+            <th>Expira</th>
+            <th>Usos</th>
+            <th>Máx Usos</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let v of vouchers">
+            <td>{{ v.code }}</td>
+            <td>{{ v.value | percent }}</td>
+            <td>{{ v.validUntil | date: 'short' }}</td>
+            <td>
+              <span class="usage-pill"
+                [class.usage-valid]="v.usages < v.maxUsages"
+                [class.usage-max]="v.usages >= v.maxUsages">
+                {{ v.usages }}
+              </span>
+            </td>
+            <td>{{ v.maxUsages }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
