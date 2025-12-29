@@ -1,0 +1,25 @@
+<Project>
+  <PropertyGroup>
+    <!-- Coverlet config -->
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <!-- coverage/coverage.cobertura.xml por projeto -->
+    <CoverletOutput>$(MSBuildProjectDirectory)/coverage/coverage</CoverletOutput>
+
+    <Exclude>
+      [MovieSpot]*.Models.*;
+      [MovieSpot]*.Migrations.*;
+      [MovieSpot]Program;
+      [MovieSpot]MovieSpot.Data.ApplicationDbContext;
+    </Exclude>
+
+    <ExcludeByFile>
+      **/Models/*.cs;
+      **/Models/**/*.cs;
+      **/Migrations/*.cs;
+      **/Migrations/**/*.cs;
+      **/Program.cs;
+      **/Data/ApplicationDbContext.cs
+    </ExcludeByFile>
+  </PropertyGroup>
+</Project>

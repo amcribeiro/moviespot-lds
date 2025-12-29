@@ -1,0 +1,68 @@
+﻿services:
+  moviespot:
+    image: ${DOCKER_REGISTRY-}moviespot
+    build:
+      context: .
+      dockerfile: MovieSpot/Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    depends_on:
+      - moviespot_db
+      - moviespot_db_test
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000/
+      - DOTNET_ENVIRONMENT=Development
+    command: >
+        bash -c "
+        until pg_isready -h moviespot_db -p 5432 -U moviespot; do
+            echo 'A aguardar pela base de dados principal...';
+            sleep 2;
+        done;
+        until pg_isready -h moviespot_db_test -p 5432 -U moviespot; do
+            echo 'A aguardar pela base de dados de testes...';
+            sleep 2;
+            done;
+        echo 'Base de dados pronta! A iniciar aplicação...';
+        dotnet MovieSpot.dll"
+    volumes:
+      - .:/app
+    networks:
+      - Ms_network
+
+  moviespot_db:
+    image: postgres:16
+    container_name: moviespot_db
+    environment:
+      - POSTGRES_DB=moviespot
+      - POSTGRES_USER=moviespot
+      - POSTGRES_PASSWORD=moviespot
+    volumes:
+      - moviespot_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - Ms_network
+
+  moviespot_db_test:
+    image: postgres:16
+    container_name: moviespot_db_test
+    environment:
+      - POSTGRES_DB=moviespot_test
+      - POSTGRES_USER=moviespot
+      - POSTGRES_PASSWORD=moviespot
+    volumes:
+      - moviespot_test_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - Ms_network
+
+networks:
+  Ms_network:
+    driver: bridge
+
+volumes:
+  moviespot_pgdata:
+  moviespot_test_pgdata:

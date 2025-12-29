@@ -1,0 +1,306 @@
+
+###################################################
+# A pipeline realiza:                             #
+# 1. Análise estática (Lint)                      #
+# 2. Compilação (Build)                           #
+# 3. Testes unitários (Backend)                   #
+# 4. Testes de integração (Backend)               #
+# 5. Testes de sistema / E2E (Frontend + Cypress) #
+###################################################
+
+stages:
+  - lint
+  - build
+  - unit_tests
+  - integration_tests
+  - system_tests
+  - deploy
+  
+###############################################################
+# VARIÁVEIS GLOBAIS                                           #
+# Configuram telemetria .NET, PostgreSQL, cache e SDK Android #
+###############################################################
+
+variables:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+  NUGET_PACKAGES: "$CI_PROJECT_DIR/.nuget/packages"
+
+  # Base de dados usada em testes, via Docker
+  POSTGRES_USER: moviespot
+  POSTGRES_PASSWORD: moviespot
+  POSTGRES_DB: moviespot_db
+  POSTGRES_HOST: postgres
+
+  # SDK Android
+  ANDROID_SDK_ROOT: "/sdk"
+
+#####################################################
+# CONFIGURAÇÃO DEFAULT                              #
+# Define imagem base, runner e cache para jobs .NET #
+#####################################################
+
+default:
+  image: mcr.microsoft.com/dotnet/sdk:9.0
+  tags: ["docker-runner-estg"]
+  cache:
+    key: "nuget-${CI_PROJECT_ID}"
+    paths:
+      - .nuget/packages
+
+#####################################################
+# 1) LINT – ANÁLISE ESTÁTICA E FORMATAÇÃO DE CÓDIGO #
+#####################################################
+
+#####################################################
+# LINT BACKEND (.NET)                               #
+# Corre: dev, master, merges e branches backend-*   #
+# Faz verificação de formatação com dotnet format   #
+#####################################################
+
+lint_backend:
+  stage: lint
+  image: mcr.microsoft.com/dotnet/sdk:9.0
+  script:
+    - dotnet restore Backend/MovieSpot.sln --source https://api.nuget.org/v3/index.json
+    - dotnet format Backend/MovieSpot.sln --verify-no-changes --report Backend/.lint/format-report.json
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - Backend/.lint/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master")'
+    - if: '$CI_COMMIT_BRANCH =~ /backend/ || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /backend/'
+    - if: '$CI_COMMIT_BRANCH !~ /backend|frontend|android/ && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME !~ /backend|frontend|android/'
+
+#######################################
+# LINT FRONTEND (ANGULAR)             #
+# Corre ESLint para o projeto Angular #
+#######################################
+
+lint_frontend:
+  stage: lint
+  image: node:20
+  before_script:
+    - cd Frontend
+    - npm ci
+    - npm install -g @angular/cli
+  script:
+    - npm run lint
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - Frontend/.lint/
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /frontend/ || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /frontend/'
+    - if: '$CI_COMMIT_BRANCH !~ /backend|frontend|android/ && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME !~ /backend|frontend|android/'
+
+#######################################################
+# LINT ANDROID                                        #
+# Corre análise estática com gradlew lintVitalRelease #
+#######################################################
+
+lint_android:
+  stage: lint
+  image: jangrewe/gitlab-ci-android:latest
+  cache:
+    key: "android-cache-${CI_PROJECT_ID}"
+    paths:
+      - /usr/lib/jvm/java-17-openjdk-amd64/
+      - /root/.gradle/caches/
+      - /root/.gradle/wrapper/
+      - /sdk/
+  before_script:
+    - if ! java -version 2>&1 | grep "17" > /dev/null; then
+        apt-get update && apt-get install -y openjdk-17-jdk;
+      fi
+    - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    - export PATH=$JAVA_HOME/bin:$PATH
+    - cd Android-Client
+    - chmod +x gradlew
+  script:
+    - ./gradlew lintVitalRelease
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - Android-Client/app/build/reports/lint-results-debug.html
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /android/ || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /android/'
+    - if: '$CI_COMMIT_BRANCH !~ /backend|frontend|android/ && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME !~ /backend|frontend|android/'
+
+###################################################
+# BUILD – BACKEND, FRONTEND E ANDROID             #
+###################################################
+
+################################# 
+# BUILD BACKEND (.NET)          #
+# Compila solução em Release    #
+#################################
+
+build_backend:
+  stage: build
+  needs: ["lint_backend"]
+  script:
+    - dotnet restore Backend/MovieSpot.sln --source https://api.nuget.org/v3/index.json
+    - dotnet build Backend/MovieSpot.sln --configuration Release
+  artifacts:
+    when: on_success
+    expire_in: 1 day
+    paths:
+      - "Backend/MovieSpot/bin/Release/net9.0/"
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "master"'
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master")'
+  - if: '$CI_COMMIT_BRANCH =~ /backend/ || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /backend/'
+  - if: '$CI_COMMIT_BRANCH !~ /backend|frontend|android/ && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME !~ /backend|frontend|android/'
+
+#####################################
+# BUILD FRONTEND (ANGULAR)          #
+# Gera build de produção para /dist #
+#####################################
+
+build_frontend:
+  stage: build
+  image: node:20
+  needs: ["lint_frontend"]
+  before_script:
+    - cd Frontend
+    - npm ci
+    - npm install -g @angular/cli
+  script:
+    - npm run build -- --configuration production
+  artifacts:
+    when: on_success
+    expire_in: 7 days
+    paths:
+      - Frontend/dist/
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /frontend/ || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /frontend/'
+    - if: '$CI_COMMIT_BRANCH !~ /backend|frontend|android/ && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME !~ /backend|frontend|android/'
+
+#############################
+# BUILD ANDROID (APK DEBUG) #
+#############################
+
+build_android:
+  stage: build
+  image: jangrewe/gitlab-ci-android:latest
+  cache:
+    key: "android-cache-${CI_PROJECT_ID}"
+    paths:
+      - /usr/lib/jvm/java-17-openjdk-amd64/
+      - /root/.gradle/caches/
+      - /root/.gradle/wrapper/
+      - /sdk/
+  before_script:
+    - if ! java -version 2>&1 | grep "17" > /dev/null; then
+        apt-get update && apt-get install -y openjdk-17-jdk;
+      fi
+    - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    - export PATH=$JAVA_HOME/bin:$PATH
+    - cd Android-Client
+    - chmod +x gradlew
+  script:
+    - ./gradlew assembleDebug
+  artifacts:
+    when: on_success
+    expire_in: 7 days
+    paths:
+      - Android-Client/app/build/outputs/apk/debug/*.apk
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /android/ || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /android/'
+    - if: '$CI_COMMIT_BRANCH !~ /backend|frontend|android/ && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME !~ /backend|frontend|android/'
+
+#################################
+# 3) TESTES UNITÁRIOS – BACKEND #
+#################################
+
+unit_tests:
+  stage: unit_tests
+  image: mcr.microsoft.com/dotnet/sdk:9.0
+  services:
+    - name: postgres:16
+      alias: postgres
+  needs: ["build_backend"]
+  script:
+    - |
+      set -e
+      curl -s https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o wait-for-it.sh
+      chmod +x wait-for-it.sh
+      ./wait-for-it.sh postgres:5432 -- echo "Postgres is up (unit tests)"
+      dotnet test Backend/MovieSpot.Tests/MovieSpot.Tests.csproj -c Release
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - "Backend/MovieSpot.Tests/**/coverage/coverage.cobertura.xml"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH =~ /backend/ || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /backend/'
+    - if: '$CI_COMMIT_BRANCH !~ /backend|frontend|android/ && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME !~ /backend|frontend|android/'
+
+#####################################
+# 4) TESTES DE INTEGRAÇÃO – BACKEND #
+#####################################
+
+integration_tests:
+  stage: integration_tests
+  image: mcr.microsoft.com/dotnet/sdk:9.0
+  services:
+    - name: postgres:16
+      alias: postgres
+  needs: ["build_backend", "unit_tests"]
+  script:
+    - |
+      set -e
+      curl -s https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o wait-for-it.sh
+      chmod +x wait-for-it.sh
+      ./wait-for-it.sh postgres:5432 -- echo "Postgres is up (integration tests)"
+      dotnet test Backend/MovieSpot.Tests.Integration/MovieSpot.Tests.Integration.csproj -c Release
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - "Backend/MovieSpot.Tests.Integration/**/coverage/coverage.cobertura.xml"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "master")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master")'
+    - when: never
+
+#####################################
+# TESTES DE SISTEMA (E2E) – CYPRESS #             
+#####################################
+    
+system_tests:
+  stage: system_tests
+  image:
+    name: cypress/included:15.7.0
+    entrypoint: [""]       
+  needs:
+    - build_frontend
+  before_script:
+    - cd Frontend
+    - npm ci
+  script:
+    - npm start -- --host 0.0.0.0 --port 4200 &
+
+    - npx wait-on --timeout 180000 http://localhost:4200
+
+    - npx cypress run --browser chrome
+
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - Frontend/cypress/screenshots
+      - Frontend/cypress/videos
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /frontend/ || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /frontend/'
+    - if: '$CI_COMMIT_BRANCH !~ /backend|frontend|android/ && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME !~ /backend|frontend|android/'
+

@@ -1,0 +1,90 @@
+SF:C:\Users\Migue\OneDrive\Ambiente de Trabalho\moviespot\MovieSpot\Program.cs
+FN:3,System.Void Program::<Main>$(System.String[])
+FNDA:0,System.Void Program::<Main>$(System.String[])
+DA:4,0
+DA:6,0
+DA:7,0
+DA:11,0
+DA:13,0
+DA:14,0
+DA:16,0
+DA:19,0
+DA:20,0
+DA:21,0
+DA:22,0
+DA:23,0
+DA:25,0
+DA:27,0
+DA:29,0
+DA:31,0
+BRDA:19,126,0,0
+BRDA:19,126,1,0
+LF:16
+LH:0
+BRF:2
+BRH:0
+FNF:1
+FNH:0
+end_of_record
+SF:C:\Users\Migue\OneDrive\Ambiente de Trabalho\moviespot\MovieSpot\WeatherForecast.cs
+FN:4,System.DateOnly MovieSpot.WeatherForecast::get_Date()
+FNDA:0,System.DateOnly MovieSpot.WeatherForecast::get_Date()
+DA:5,0
+FN:6,System.Int32 MovieSpot.WeatherForecast::get_TemperatureC()
+FNDA:0,System.Int32 MovieSpot.WeatherForecast::get_TemperatureC()
+DA:7,0
+FN:8,System.Int32 MovieSpot.WeatherForecast::get_TemperatureF()
+FNDA:0,System.Int32 MovieSpot.WeatherForecast::get_TemperatureF()
+DA:9,0
+FN:10,System.String MovieSpot.WeatherForecast::get_Summary()
+FNDA:0,System.String MovieSpot.WeatherForecast::get_Summary()
+DA:11,0
+LF:4
+LH:0
+BRF:0
+BRH:0
+FNF:4
+FNH:0
+end_of_record
+SF:C:\Users\Migue\OneDrive\Ambiente de Trabalho\moviespot\MovieSpot\Data\ApplicationDbContext.cs
+FN:6,System.Void MovieSpot.Data.ApplicationDbContext::.ctor(Microsoft.EntityFrameworkCore.DbContextOptions`1<MovieSpot.Data.ApplicationDbContext>)
+FNDA:0,System.Void MovieSpot.Data.ApplicationDbContext::.ctor(Microsoft.EntityFrameworkCore.DbContextOptions`1<MovieSpot.Data.ApplicationDbContext>)
+DA:7,0
+LF:1
+LH:0
+BRF:0
+BRH:0
+FNF:1
+FNH:0
+end_of_record
+SF:C:\Users\Migue\OneDrive\Ambiente de Trabalho\moviespot\MovieSpot\Controllers\WeatherForecastController.cs
+FN:22,System.Collections.Generic.IEnumerable`1<MovieSpot.WeatherForecast> MovieSpot.Controllers.WeatherForecastController::Get()
+FNDA:0,System.Collections.Generic.IEnumerable`1<MovieSpot.WeatherForecast> MovieSpot.Controllers.WeatherForecastController::Get()
+DA:23,0
+DA:24,0
+DA:25,0
+DA:26,0
+DA:27,0
+DA:28,0
+DA:29,0
+DA:30,0
+DA:31,0
+FN:15,System.Void MovieSpot.Controllers.WeatherForecastController::.ctor(Microsoft.Extensions.Logging.ILogger`1<MovieSpot.Controllers.WeatherForecastController>)
+FNDA:0,System.Void MovieSpot.Controllers.WeatherForecastController::.ctor(Microsoft.Extensions.Logging.ILogger`1<MovieSpot.Controllers.WeatherForecastController>)
+DA:16,0
+DA:17,0
+DA:18,0
+DA:19,0
+FN:8,System.Void MovieSpot.Controllers.WeatherForecastController::.cctor()
+FNDA:0,System.Void MovieSpot.Controllers.WeatherForecastController::.cctor()
+DA:9,0
+DA:10,0
+DA:11,0
+DA:12,0
+LF:17
+LH:0
+BRF:0
+BRH:0
+FNF:3
+FNH:0
+end_of_record
